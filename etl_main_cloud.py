@@ -159,9 +159,77 @@ def generate_giva_format(po_file, output_file):
 
     print(f"✅ GIVA Excel generated at: {output_file}")
 
-# -------------------- Runner --------------------
+import psycopg2
 
-if __name__ == "__main__":
-    po_file = "uploads/PO09363.xlsx"
-    output_file = "outputs/Output_PO09363-2.xlsx"
-    generate_giva_format(po_file, output_file)
+import psycopg2
+
+def insert_new_mapping(givadsgcd, auradsgcd, remarks=None, oldgivadsgcd=None):
+    NEON_CONN_PARAMS = {
+        'host': "ep-mute-grass-a138r2r4-pooler.ap-southeast-1.aws.neon.tech",
+        'dbname': "neondb",
+        'user': "neondb_owner",
+        'password': "npg_O5yZTR4PeiHM",
+        'sslmode': "require"
+    }
+
+    try:
+        conn = psycopg2.connect(**NEON_CONN_PARAMS)
+        cursor = conn.cursor()
+
+        # Check for existing givadsgcd
+        cursor.execute("SELECT 1 FROM public.giva_sku_mapping WHERE givadsgcd = %s", (givadsgcd,))
+        if cursor.fetchone():
+            print(f"⚠️ Duplicate entry skipped: {givadsgcd} already exists.")
+            return
+
+        # Insert if not duplicate
+        insert_query = """
+            INSERT INTO public.giva_sku_mapping (givadsgcd, auradsgcd, remarks, oldgivadsgcd)
+            VALUES (%s, %s, %s, %s)
+        """
+        cursor.execute(insert_query, (givadsgcd, auradsgcd, remarks, oldgivadsgcd))
+        conn.commit()
+        print(f"✅ Inserted mapping: {givadsgcd} → {auradsgcd}")
+
+    except Exception as e:
+        print(f"❌ Failed to insert mapping: {e}")
+    finally:
+        if conn:
+            cursor.close()
+            conn.close()
+
+insert_new_mapping("GDLER0863", "25GLE30011A0GL", "", "")
+import psycopg2
+
+def delete_duplicate_mappings():
+    NEON_CONN_PARAMS = {
+        'host': "ep-mute-grass-a138r2r4-pooler.ap-southeast-1.aws.neon.tech",
+        'dbname': "neondb",
+        'user': "neondb_owner",
+        'password': "npg_O5yZTR4PeiHM",
+        'sslmode': "require"
+    }
+
+    delete_query = """
+    DELETE FROM public.giva_sku_mapping a
+    USING public.giva_sku_mapping b
+    WHERE 
+        a.ctid > b.ctid AND  -- keep first occurrence
+        a.givadsgcd = b.givadsgcd AND
+        a.auradsgcd = b.auradsgcd
+    """
+
+    try:
+        conn = psycopg2.connect(**NEON_CONN_PARAMS)
+        cursor = conn.cursor()
+        cursor.execute(delete_query)
+        deleted_count = cursor.rowcount
+        conn.commit()
+        print(f"✅ Deleted {deleted_count} duplicate rows based on givadsgcd + auradsgcd.")
+    except Exception as e:
+        print(f"❌ Failed to delete duplicates: {e}")
+    finally:
+        if conn:
+            cursor.close()
+            conn.close()
+delete_duplicate_mappings()
