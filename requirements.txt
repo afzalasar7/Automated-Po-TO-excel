@@ -3,4 +3,5 @@ pandas
 openpyxl
 psycopg2-binary
 numpy
+dotenv
 streamlit_option_menu
