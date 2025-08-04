@@ -159,9 +159,6 @@ def generate_giva_format(po_file, output_file):
 
     print(f"✅ GIVA Excel generated at: {output_file}")
 
-import psycopg2
-
-import psycopg2
 
 def insert_new_mapping(givadsgcd, auradsgcd, remarks=None, oldgivadsgcd=None):
     NEON_CONN_PARAMS = {
@@ -198,38 +195,3 @@ def insert_new_mapping(givadsgcd, auradsgcd, remarks=None, oldgivadsgcd=None):
             cursor.close()
             conn.close()
 
-insert_new_mapping("GDLER0863", "25GLE30011A0GL", "", "")
-import psycopg2
-
-def delete_duplicate_mappings():
-    NEON_CONN_PARAMS = {
-        'host': "ep-mute-grass-a138r2r4-pooler.ap-southeast-1.aws.neon.tech",
-        'dbname': "neondb",
-        'user': "neondb_owner",
-        'password': "npg_O5yZTR4PeiHM",
-        'sslmode': "require"
-    }
-
-    delete_query = """
-    DELETE FROM public.giva_sku_mapping a
-    USING public.giva_sku_mapping b
-    WHERE 
-        a.ctid > b.ctid AND  -- keep first occurrence
-        a.givadsgcd = b.givadsgcd AND
-        a.auradsgcd = b.auradsgcd
-    """
-
-    try:
-        conn = psycopg2.connect(**NEON_CONN_PARAMS)
-        cursor = conn.cursor()
-        cursor.execute(delete_query)
-        deleted_count = cursor.rowcount
-        conn.commit()
-        print(f"✅ Deleted {deleted_count} duplicate rows based on givadsgcd + auradsgcd.")
-    except Exception as e:
-        print(f"❌ Failed to delete duplicates: {e}")
-    finally:
-        if conn:
-            cursor.close()
-            conn.close()
-delete_duplicate_mappings()

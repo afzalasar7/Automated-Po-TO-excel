@@ -108,7 +108,27 @@ elif selected == "Add New SKU":
 
 # ---------------------- Footer ----------------------
 st.markdown("""
-<footer>
-    Made by Afzal Asar & Ruchir Powar ✨ | AI Automation Team
-</footer>
+<style>
+footer {
+    position: relative;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    padding: 1rem 0;
+    background-color: #f0f7ff;
+    color: #4B0082;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 3rem;
+}
+</style>
+
+<div style="width: 100%;">
+    <footer>
+        Made by Afzal Asar & Ruchir Powar ✨ | AI Automation Team
+    </footer>
+</div>
 """, unsafe_allow_html=True)
+

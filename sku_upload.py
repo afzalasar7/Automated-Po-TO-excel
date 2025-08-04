@@ -44,7 +44,7 @@ def insert_new_mapping(givadsgcd, auradsgcd, remarks=None, oldgivadsgcd=None):
 
 # ---------- Page Renderer ----------
 def render():
-    st.markdown("<h2>🆕 Add Giva Design Code and Aura Style Code:</h2>", unsafe_allow_html=True)
+    st.markdown("<h2>Add Giva Design Code and Aura Style Code:</h2>", unsafe_allow_html=True)
 
     st.markdown("""
     <table style="width:100%; border: 1px solid #ddd; border-collapse: collapse; margin-bottom: 1em;">
@@ -52,14 +52,12 @@ def render():
             <tr style="background-color: #6F42C1; color: white;">
                 <th style="padding: 8px; border: 1px solid #ddd;">Giva Design Code</th>
                 <th style="padding: 8px; border: 1px solid #ddd;">Aura Style Code</th>
-                <th style="padding: 8px; border: 1px solid #ddd;">Remarks (Is Earring?)</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td style="padding: 8px; border: 1px solid #ddd;">GDLER0863</td>
                 <td style="padding: 8px; border: 1px solid #ddd;">25GLE30011A0GL</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">Yes / No</td>
             </tr>
         </tbody>
     </table>
@@ -68,28 +66,45 @@ def render():
     # ---------- Tabs ----------
     tab1, tab2 = st.tabs(["📝 Manual Entry", "📋 Bulk Paste from Excel"])
 
-    # ---------- Tab 1: Manual Entry ----------
+    # ---------- Earring Code Set ----------
+    earring_codes = {"LE", "GE", "TE", "NE", "NR", "PE"}
+
+# ---------- Tab 1: Manual Entry ----------
     with tab1:
         if "sku_rows" not in st.session_state:
             st.session_state.sku_rows = 1
 
         input_data = []
         for i in range(st.session_state.sku_rows):
-            cols = st.columns([4, 4, 4])  # Giva | Aura | Remarks
+            cols = st.columns([6, 6])  # Giva | Aura
             with cols[0]:
-                giva = st.text_input(f"Giva Code {i+1}", key=f"giva_{i}")
+                giva = st.text_input(f"Giva Design Code {i+1}", key=f"giva_{i}")
             with cols[1]:
-                aura = st.text_input(f"Aura Code {i+1}", key=f"aura_{i}")
-            with cols[2]:
-                st.markdown('<div style="margin-bottom: 6px;"><b>Remarks (Is Earring?)</b></div>', unsafe_allow_html=True)
-                is_earring = st.checkbox(" ", key=f"earring_{i}", label_visibility="collapsed")
+                aura = st.text_input(f"Aura Style Code {i+1}", key=f"aura_{i}")
 
-            input_data.append((giva.strip(), aura.strip(), "regular Chaki" if is_earring else None))
+            # Auto-calculate remarks based on aura substring
+            code_segment = aura[3:5].upper() if len(aura) >= 5 else ""
+            remarks = "regular Chaki" if code_segment in earring_codes else None
 
+            input_data.append((giva.strip(), aura.strip(), remarks))
+
+                # Inject custom CSS for compact button style
+        st.markdown("""
+            <style>
+            div.stButton > button {
+                padding: 5px 8px;
+                font-size: 10px;
+                line-height: 1;
+            }
+            </style>
+        """, unsafe_allow_html=True)
+
+        # Render the button
         if st.button("➕ Add Another Row"):
             st.session_state.sku_rows += 1
 
-        submit_cols = st.columns([1, 6, 1])
+
+        submit_cols = st.columns([1, 50, 1])
         with submit_cols[1]:
             submitted = st.button("✅ Submit All Mappings", use_container_width=True)
             if submitted:
@@ -104,33 +119,41 @@ def render():
 
     # ---------- Tab 2: Bulk Paste ----------
     with tab2:
-        st.info("Paste your Excel data below. Format must match: `givadsgcd`, `auradsgcd`, and `remarks (is earring)`.")
+        st.info("Paste your Excel data below. Format must match: `Giva Design Code`, `Aura Style Code`.")
+        st.warning("Please Ensure You insert only the correct data in the correct format.")
 
-        # Template for editable table
-        template_df = pd.DataFrame({
-            "givadsgcd": [""],
-            "auradsgcd": [""],
-            "remarks (is earring)": [False]
-        })
+        if "bulk_table_df" not in st.session_state or st.session_state.get("refresh_bulk_table", False):
+            st.session_state.bulk_table_df = pd.DataFrame({
+                "Giva Design Code": [""] * 100,
+                "Aura Style Code": [""] * 100,
+            })
+            st.session_state.refresh_bulk_table = False
 
         edited_df = st.data_editor(
-            template_df,
+            st.session_state.bulk_table_df,
             num_rows="dynamic",
             use_container_width=True,
             key="editable_bulk_upload"
         )
 
-        submit_bulk = st.button("🚀 Submit Bulk Mappings", use_container_width=True)
+        st.session_state.bulk_table_df = edited_df
+
+        btn_cols = st.columns([5, 20, 13, 5])
+        with btn_cols[1]:
+            submit_bulk = st.button("🚀 Submit", use_container_width=True)
+        with btn_cols[2]:
+            if st.button("🔄 Refresh Table", use_container_width=True):
+                st.session_state.refresh_bulk_table = True
+                st.rerun()
+
         if submit_bulk:
             for i, row in edited_df.iterrows():
-                giva = row["givadsgcd"].strip()
-                aura = row["auradsgcd"].strip()
-                remarks = "regular Chaki" if row["remarks (is earring)"] else None
+                giva = row["Giva Design Code"].strip()
+                aura = row["Aura Style Code"].strip()
+                code_segment = aura[3:5].upper() if len(aura) >= 5 else ""
+                remarks = "regular Chaki" if code_segment in earring_codes else None
 
                 if giva and aura:
                     insert_new_mapping(giva, aura, remarks)
                 else:
-                    st.markdown(
-                        f"<div style='color:#d2691e;'>⚠️ Row {i+1}: Giva or Aura code is empty. Skipped.</div>",
-                        unsafe_allow_html=True
-                    )
+                    continue  # skip incomplete rows
