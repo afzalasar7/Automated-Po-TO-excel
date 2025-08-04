@@ -1,17 +1,16 @@
 import streamlit as st
 import psycopg2
 import pandas as pd
+import os
+import json
+from dotenv import load_dotenv
 
+load_dotenv()
+
+# Load dict from JSON string in env
 # ---------- Database Function ----------
 def insert_new_mapping(givadsgcd, auradsgcd, remarks=None, oldgivadsgcd=None):
-    NEON_CONN_PARAMS = {
-        'host': "ep-mute-grass-a138r2r4-pooler.ap-southeast-1.aws.neon.tech",
-        'dbname': "neondb",
-        'user': "neondb_owner",
-        'password': "npg_O5yZTR4PeiHM",
-        'sslmode': "require"
-    }
-
+    NEON_CONN_PARAMS = json.loads(os.getenv("NEON_CONN_PARAMS_JSON"))
     try:
         conn = psycopg2.connect(**NEON_CONN_PARAMS)
         cursor = conn.cursor()

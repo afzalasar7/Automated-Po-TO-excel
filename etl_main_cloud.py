@@ -3,6 +3,11 @@ import numpy as np
 import psycopg2
 import os
 import math
+import os
+import json
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # -------------------- Helper Functions --------------------
 
@@ -113,13 +118,8 @@ def generate_giva_format(po_file, output_file):
     df_po = df_po[df_po['SKU'].notna()].rename(columns={'SKU': 'GivaDsgCd'})
 
     # Neon DB connection
-    NEON_CONN_PARAMS = {
-        'host': "ep-mute-grass-a138r2r4-pooler.ap-southeast-1.aws.neon.tech",
-        'dbname': "neondb",
-        'user': "neondb_owner",
-        'password': "npg_O5yZTR4PeiHM",
-        'sslmode': "require"
-    }
+    NEON_CONN_PARAMS = json.loads(os.getenv("NEON_CONN_PARAMS_JSON"))
+
     try:
         conn = psycopg2.connect(**NEON_CONN_PARAMS)
         print("✅ Connected to Neon PostgreSQL")
@@ -161,13 +161,8 @@ def generate_giva_format(po_file, output_file):
 
 
 def insert_new_mapping(givadsgcd, auradsgcd, remarks=None, oldgivadsgcd=None):
-    NEON_CONN_PARAMS = {
-        'host': "ep-mute-grass-a138r2r4-pooler.ap-southeast-1.aws.neon.tech",
-        'dbname': "neondb",
-        'user': "neondb_owner",
-        'password': "npg_O5yZTR4PeiHM",
-        'sslmode': "require"
-    }
+    NEON_CONN_PARAMS = json.loads(os.getenv("NEON_CONN_PARAMS_JSON"))
+    
 
     try:
         conn = psycopg2.connect(**NEON_CONN_PARAMS)
