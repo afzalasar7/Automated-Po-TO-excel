@@ -1,5 +1,3 @@
-# custom_css.py
-
 def custom_css():
     return """
     <style>
@@ -7,83 +5,105 @@ def custom_css():
         height: 100%;
         margin: 0;
         padding: 0;
-        font-family: Arial, sans-serif;
-        background-color: #f5f5f5;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background-color: #f2f4f8; /* ✅ Soft modern background */
+        color: #333;
     }
 
-    .container {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 40px;
-    }
-
-    h1 {
-        font-size: 36px;
-        font-weight: bold;
-        color: #4CAF50;
-        text-align: center;
-        margin-bottom: 1rem;
-    }
-
-    .upload-box {
-        background-color: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    /* Layout Containers */
+    .container, .upload-box {
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         padding: 2rem;
         margin-bottom: 2rem;
     }
 
+    h1, h2, h3 {
+        color: #6F42C1;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    /* Buttons */
     .stButton>button {
-        background-color: #4CAF50;
+        background-color: #6F42C1;
         color: white;
-        font-size: 18px;
-        font-weight: bold;
-        padding: 0.75em 1.5em;
+        font-size: 16px;
+        font-weight: 600;
+        padding: 0.6rem 1.2rem;
         border: none;
-        border-radius: 8px;
+        border-radius: 6px;
         cursor: pointer;
-        transition: background-color 0.3s;
+        transition: 0.3s ease;
     }
 
     .stButton>button:hover {
-        background-color: #45a049;
+        background-color: #5a32a3;
     }
 
-    .download-box button {
-        background-color: #4CAF50 !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 8px !important;
-        padding: 0.75em 1.5em !important;
-        font-size: 16px !important;
-        cursor: pointer !important;
-    }
-
+    /* Tabs */
     .stTabs [role="tab"] {
-        background-color: #ffffff;
-        color: #4CAF50;
+        background-color: #e6e0f3;
+        color: #6F42C1;
         font-weight: 600;
         font-size: 16px;
-        padding: 0.6rem 1rem;
+        padding: 0.5rem 1rem;
         margin-right: 4px;
-        border-radius: 10px 10px 0 0;
-        transition: background-color 0.3s, color 0.3s;
+        border-radius: 8px 8px 0 0;
+        transition: 0.3s ease;
     }
 
     .stTabs [aria-selected="true"] {
-        background-color: #4CAF50 !important;
+        background-color: #6F42C1 !important;
         color: white !important;
     }
 
-    footer {
-        position: fixed;
-        bottom: 0;
+    /* Alerts & Notes */
+    .element-container .stAlert {
+        border-radius: 8px;
+    }
+
+    /* Tables */
+    table {
         width: 100%;
-        background-color: #f5f5f5;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
         padding: 10px;
         text-align: center;
-        font-size: small;
-        color: #4CAF50;
+    }
+
+    thead {
+        background-color: #6F42C1;
+        color: white;
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: #f6f6f6;
+    }
+
+    /* Input Fields */
+    input {
+        background-color: #ffffff;
+        border: 1px solid #cccccc;
+        border-radius: 4px;
+        padding: 8px;
+        font-size: 14px;
+        width: 100%;
+    }
+
+    /* Footer */
+    footer {
+        background-color: #f0f0f0;
+        padding: 12px;
+        font-size: 0.85rem;
+        text-align: center;
+        color: #6F42C1;
+        border-top: 1px solid #ccc;
+        margin-top: 3rem;
     }
     </style>
     """
